@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDS Nano</title>
+<style>
+  :root{
+    --bg: #e6edf5;
+    --accent: #0055a6;
+    --accent-dim: #003b73;
+    --text: #d7212e;
+    --text-dim: #b8525b;
+
+    --shadow-light: #ffffff;
+    --shadow-dark: #c3ccd9;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 28px 16px 60px;
+  }
+
+  /* Reusable neomorphic surfaces */
+  .raised{
+    background: var(--bg);
+    box-shadow:
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+  }
+  .raised-sm{
+    background: var(--bg);
+    box-shadow:
+      4px 4px 8px var(--shadow-dark),
+      -4px -4px 8px var(--shadow-light);
+  }
+  .pressed{
+    background: var(--bg);
+    box-shadow:
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
+  }
+
+  /* Header */
+  .header{
+    width:100%;
+    max-width: 720px;
+    display:flex;
+    flex-wrap: wrap;
+    justify-content:space-between;
+    align-items:center;
+    gap: 12px;
+    padding: 18px 22px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+  }
+  .header-left{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .header-text{
+    min-width: 0;
+    display:flex;
+    flex-direction: column;
+  }
+  .logo-wrap{
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+  .logo{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .eyebrow{
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    font-weight: 700;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  .title{
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  .clock{
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align:right;
+    line-height: 1.4;
+    padding: 10px 14px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .clock span{ display:block; }
+  .clock .time{ color: var(--text); font-size: 14px; font-weight:700; margin-top: 2px; }
+
+  @media (max-width: 480px){
+    .header{ padding: 16px; }
+    .clock{ font-size: 11px; padding: 8px 12px; }
+    .clock .time{ font-size: 13px; }
+    .title{ font-size: 17px; }
+    .eyebrow{ font-size: 17px; }
+  }
+
+  /* Video */
+  .stage{
+    width: 100%;
+    max-width: 720px;
+    border-radius: 22px;
+    overflow: hidden;
+    padding: 10px;
+  }
+  .video-inner{
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  video{
+    width: 100%;
+    display:block;
+    background: #000;
+    aspect-ratio: 16/9;
+  }
+  .now-playing{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 12px 16px;
+    margin-top: 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  .now-playing .dot{
+    width:9px; height:9px; border-radius:50%;
+    background: var(--bg);
+    box-shadow:
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
+    flex-shrink:0;
+  }
+  .now-playing.active .dot{
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0,85,166,0.15);
+  }
+  .now-playing .label{ color: var(--text); font-weight:700; }
+
+  /* Buttons */
+  .picker{
+    width: 100%;
+    max-width: 720px;
+    margin-top: 26px;
+  }
+  .picker-label{
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    font-weight: 700;
+    margin-bottom: 14px;
+    margin-left: 4px;
+  }
+  .btn-grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  /* 4 tombol -> tampil 2 x 2 di layar lebar */
+  @media (min-width: 600px){
+    .btn-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  .pump-btn{
+    position:relative;
+    text-align:left;
+    border: none;
+    border-radius: 18px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+    color: var(--text);
+    font-family: inherit;
+  }
+  .pump-btn:active{
+    transform: scale(0.98);
+  }
+  .pump-btn.selected{
+    box-shadow:
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
+  }
+  .pump-icon{
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .pump-btn.selected .pump-icon{
+    background: var(--accent);
+    color: #fff;
+    box-shadow: none;
+  }
+  .pump-name{
+    display:block;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .pump-time{
+    display:block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  .hint{
+    max-width: 720px;
+    width:100%;
+    margin-top: 26px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header raised">
+    <div class="header-left">
+      <div class="logo-wrap raised-sm">
+        <img src="logo.png" alt="Logo" class="logo">
+      </div>
+      <div class="header-text">
+        <div class="title">FRISTAM</div>
+        <div class="eyebrow">FDS Nano</div>
+      </div>
+    </div>
+    <div class="clock pressed">
+      <span>Diakses</span>
+      <span class="time" id="clockTime">--:--:--</span>
+    </div>
+  </div>
+
+  <div class="stage raised">
+    <div class="video-inner">
+      <video id="video" controls playsinline>
+        <!-- GANTI src ini dengan file video kamu -->
+        <source src="fluivac/video-fluivac.mp4" type="video/mp4">
+        Browser kamu tidak mendukung tag video.
+      </video>
+    </div>
+    <div class="now-playing pressed" id="nowPlaying">
+      <span class="dot"></span>
+      <span>Tekan salah satu tombol di bawah untuk mulai</span>
+    </div>
+  </div>
+
+  <div class="picker">
+    <div class="picker-label">TEKAN SALAH SATU TOMBOL DI BAWAH</div>
+    <div class="btn-grid" id="btnGrid">
+      <!-- tombol dibuat otomatis lewat JS dari data PUMPS di bawah -->
+    </div>
+  </div>
+
+  <div class="hint pressed">
+    Timestamp diambil otomatis dari waktu HP/komputer kamu saat halaman dibuka.
+    Video akan lompat ke bagian sesuai pompa yang dipilih lalu langsung diputar.
+  </div>
+
+<script>
+  // ======================================================
+  // KONFIGURASI — UBAH BAGIAN INI SESUAI KEBUTUHAN
+  // ======================================================
+
+  // 1) Ganti path video di tag <source> di atas (cari "video-fluivac.mp4")
+
+  // 2) Atur timestamp mulai (dalam DETIK) untuk tiap tombol di bawah ini.
+  //    Sekarang ada 4 tombol — sesuaikan detiknya dengan video kamu.
+  const PUMPS = [
+    {
+      name: "FDS Nano",
+      startSeconds: 5       // <-- ganti sesuai detik ke berapa di video
+    },
+    {
+      name: "General Specification",
+      startSeconds: 8      // <-- ganti sesuai detik ke berapa di video
+    },
+    {
+      name: "How it works",
+      startSeconds: 13      // <-- ganti sesuai detik ke berapa di video
+    },
+    {
+      name: "Disassembly",
+      startSeconds: 31      // <-- ganti sesuai detik ke berapa di video
+    }
+  ];
+
+  // ======================================================
+  // LOGIKA — tidak perlu diubah
+  // ======================================================
+
+  function formatTime(sec){
+    const m = Math.floor(sec/60);
+    const s = Math.floor(sec%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  const grid = document.getElementById('btnGrid');
+  const video = document.getElementById('video');
+  const nowPlaying = document.getElementById('nowPlaying');
+
+  PUMPS.forEach((pump, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'pump-btn raised-sm';
+    btn.innerHTML = `
+      <span class="pump-name">${pump.name}</span>
+      <span class="pump-time">mulai ${formatTime(pump.startSeconds)}</span>
+    `;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pump-btn').forEach(b => {
+        b.classList.remove('selected');
+        b.classList.add('raised-sm');
+      });
+      btn.classList.remove('raised-sm');
+      btn.classList.add('selected');
+
+      video.currentTime = pump.startSeconds;
+      video.play();
+
+      nowPlaying.classList.add('active');
+      nowPlaying.innerHTML = `<span class="dot"></span><span>Sedang diputar: <span class="label">${pump.name}</span></span>`;
+
+      // Waktu akses tercatat di log ini juga (opsional, bisa dihapus)
+      console.log(`Dipilih: ${pump.name} pada ${new Date().toLocaleString('id-ID')}`);
+    });
+    grid.appendChild(btn);
+  });
+
+  // Jam waktu akses (real-time, waktu lokal perangkat)
+  function updateClock(){
+    const now = new Date();
+    document.getElementById('clockTime').textContent =
+      now.toLocaleString('id-ID', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>
