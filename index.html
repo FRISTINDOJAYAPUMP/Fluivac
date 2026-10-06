@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FDS Nano</title>
+<title>Fluivac</title>
 <style>
   :root{
     --bg: #e6edf5;
@@ -190,7 +190,7 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  /* 4 tombol -> tampil 2 x 2 di layar lebar */
+  /* tampil 2 kolom di layar lebar */
   @media (min-width: 600px){
     .btn-grid{ grid-template-columns: repeat(2, 1fr); }
   }
@@ -266,8 +266,8 @@
         <img src="logo.png" alt="Logo" class="logo">
       </div>
       <div class="header-text">
-        <div class="title">FRISTAM</div>
-        <div class="eyebrow">FDS Nano</div>
+        <div class="title">Fluidor</div>
+        <div class="eyebrow">Fluivac</div>
       </div>
     </div>
     <div class="clock pressed">
@@ -310,23 +310,35 @@
   // 1) Ganti path video di tag <source> di atas (cari "video-fluivac.mp4")
 
   // 2) Atur timestamp mulai (dalam DETIK) untuk tiap tombol di bawah ini.
-  //    Sekarang ada 4 tombol — sesuaikan detiknya dengan video kamu.
+  //    Sekarang ada 7 tombol — sesuaikan detiknya dengan video kamu.
   const PUMPS = [
     {
-      name: "FDS Nano",
-      startSeconds: 5       // <-- ganti sesuai detik ke berapa di video
+      name: "Fluivac",
+      startSeconds: 4       // <-- ganti sesuai detik ke berapa di video
     },
     {
-      name: "General Specification",
-      startSeconds: 8      // <-- ganti sesuai detik ke berapa di video
+      name: "Design Specification",
+      startSeconds: 10      // <-- ganti sesuai detik ke berapa di video
     },
     {
-      name: "How it works",
-      startSeconds: 13      // <-- ganti sesuai detik ke berapa di video
+      name: "Push",
+      startSeconds: 18      // <-- ganti sesuai detik ke berapa di video
     },
     {
-      name: "Disassembly",
-      startSeconds: 31      // <-- ganti sesuai detik ke berapa di video
+      name: "Blow",
+      startSeconds: 26      // <-- ganti sesuai detik ke berapa di video
+    },
+    {
+      name: "Rinse",
+      startSeconds: 37      // <-- ganti nama & detik
+    },
+    {
+      name: "Dry",
+      startSeconds: 43      // <-- ganti nama & detik
+    },
+    {
+      name: "Internal view",
+      startSeconds: 47      // <-- ganti nama & detik
     }
   ];
 
